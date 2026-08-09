@@ -13,7 +13,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-// Default seed exercises from ExerciseDB schema
+// Default seed exercises from ExerciseDB & MuscleWiki schemas for Home & Gym
 var defaultExercises = []models.Exercise{
 	{
 		ExerciseID: "ex_001",
@@ -24,6 +24,7 @@ var defaultExercises = []models.Exercise{
 		Target:     "pectorals",
 		GIFUrl:     "https://v2.exercisedb.io/image/3s-A1gB-Tz9m7g",
 		Image:      "/images/workout_full_body.png",
+		Location:   "gym",
 		SecondaryMuscles: []string{"delts", "triceps"},
 		Instructions: []string{
 			"Nằm ngửa trên ghế tập bench ngang, chân đặt chắc chắn trên sàn.",
@@ -39,6 +40,50 @@ var defaultExercises = []models.Exercise{
 	},
 	{
 		ExerciseID: "ex_002",
+		Name:       "Bodyweight Push-Up",
+		NameVi:     "Chống Đẩy Hít Đất Tự Do (Push-Up)",
+		BodyPart:   "chest",
+		Equipment:  "body weight",
+		Target:     "pectorals",
+		GIFUrl:     "https://v2.exercisedb.io/image/9s-B2gB-Tz9m7h",
+		Image:      "/images/workout_full_body.png",
+		Location:   "home",
+		SecondaryMuscles: []string{"triceps", "core"},
+		Instructions: []string{
+			"Chống 2 tay xuống thảm rộng bằng vai, thân người tạo thành đường thẳng.",
+			"Hạ ngực xuống sát thảm, khuỷu tay mở góc 45 độ.",
+			"Dùng lực cơ ngực đẩy người trở lại vị trí ban đầu.",
+		},
+		Sets:           4,
+		Reps:           15,
+		RestSeconds:    45,
+		CaloriesBurned: 95,
+		Difficulty:     "Beginner",
+	},
+	{
+		ExerciseID: "ex_003",
+		Name:       "Dumbbell Chest Flyes",
+		NameVi:     "Banh Ngực Với Tạ Đơn (Dumbbell Flyes)",
+		BodyPart:   "chest",
+		Equipment:  "dumbbell",
+		Target:     "pectorals",
+		GIFUrl:     "https://v2.exercisedb.io/image/1s-C3gB-Tz9m7i",
+		Image:      "/images/workout_full_body.png",
+		Location:   "both",
+		SecondaryMuscles: []string{"front delts"},
+		Instructions: []string{
+			"Nằm trên ghế tập, mỗi tay cầm 1 quả tạ đơn duỗi vuông góc.",
+			"Banh rộng 2 tay ra 2 bên dạng hình cánh cung hít vào.",
+			"Khép tạ lại về giữa ngực gồng chặt cơ ngực và thở ra.",
+		},
+		Sets:           3,
+		Reps:           12,
+		RestSeconds:    45,
+		CaloriesBurned: 85,
+		Difficulty:     "Intermediate",
+	},
+	{
+		ExerciseID: "ex_004",
 		Name:       "Bodyweight Squat",
 		NameVi:     "Squat Tự Do Cá Nhân (Bodyweight Squat)",
 		BodyPart:   "upper legs",
@@ -46,6 +91,7 @@ var defaultExercises = []models.Exercise{
 		Target:     "quads",
 		GIFUrl:     "https://v2.exercisedb.io/image/9s-B2gB-Tz9m7h",
 		Image:      "/images/workout_leg.png",
+		Location:   "home",
 		SecondaryMuscles: []string{"glutes", "hamstrings", "calves"},
 		Instructions: []string{
 			"Đứng thẳng, 2 chân rộng bằng vai, mũi chân hơi hướng ra ngoài.",
@@ -60,7 +106,51 @@ var defaultExercises = []models.Exercise{
 		Difficulty:     "Beginner",
 	},
 	{
-		ExerciseID: "ex_003",
+		ExerciseID: "ex_005",
+		Name:       "Barbell Back Squat",
+		NameVi:     "Gánh Tạ Đòn Đùi Sau (Barbell Back Squat)",
+		BodyPart:   "upper legs",
+		Equipment:  "barbell",
+		Target:     "quads",
+		GIFUrl:     "https://v2.exercisedb.io/image/3s-A1gB-Tz9m7g",
+		Image:      "/images/workout_leg.png",
+		Location:   "gym",
+		SecondaryMuscles: []string{"glutes", "lower back"},
+		Instructions: []string{
+			"Đặt thanh đòn tạ lên phần cơ cầu vai (Upper Traps).",
+			"Gồng chắc cơ bụng, hạ đùi xuống sâu dưới góc 90 độ.",
+			"Đẩy mạnh đùi đứng dậy hết hành trình.",
+		},
+		Sets:           4,
+		Reps:           10,
+		RestSeconds:    90,
+		CaloriesBurned: 150,
+		Difficulty:     "Advanced",
+	},
+	{
+		ExerciseID: "ex_006",
+		Name:       "Dumbbell Romanian Deadlift",
+		NameVi:     "Deadlift Tạ Đơn Đùi Sau (Dumbbell RDL)",
+		BodyPart:   "upper legs",
+		Equipment:  "dumbbell",
+		Target:     "hamstrings",
+		GIFUrl:     "https://v2.exercisedb.io/image/1s-C3gB-Tz9m7i",
+		Image:      "/images/workout_leg.png",
+		Location:   "both",
+		SecondaryMuscles: []string{"glutes", "lower back"},
+		Instructions: []string{
+			"Đứng thẳng cầm 2 quả tạ đơn trước đùi, chân rộng bằng hông.",
+			"Đẩy hông ra sau tối đa, hạ tạ dọc theo cẳng chân cho đến khi đùi sau căng dãn.",
+			"Kéo hông về trước để đứng thẳng.",
+		},
+		Sets:           4,
+		Reps:           12,
+		RestSeconds:    60,
+		CaloriesBurned: 110,
+		Difficulty:     "Intermediate",
+	},
+	{
+		ExerciseID: "ex_007",
 		Name:       "Dumbbell Bicep Curl",
 		NameVi:     "Cuốn Tay Trước Với Tạ Đơn (Bicep Curl)",
 		BodyPart:   "upper arms",
@@ -68,6 +158,7 @@ var defaultExercises = []models.Exercise{
 		Target:     "biceps",
 		GIFUrl:     "https://v2.exercisedb.io/image/1s-C3gB-Tz9m7i",
 		Image:      "/images/workout_upper.png",
+		Location:   "both",
 		SecondaryMuscles: []string{"forearms"},
 		Instructions: []string{
 			"Đứng thẳng, mỗi tay cầm 1 quả tạ đơn, lòng bàn tay hướng về trước.",
@@ -82,7 +173,29 @@ var defaultExercises = []models.Exercise{
 		Difficulty:     "Beginner",
 	},
 	{
-		ExerciseID: "ex_004",
+		ExerciseID: "ex_008",
+		Name:       "Bench Tricep Dips",
+		NameVi:     "Nhún Tay Sau Với Ghế (Bench Dips)",
+		BodyPart:   "upper arms",
+		Equipment:  "body weight",
+		Target:     "triceps",
+		GIFUrl:     "https://v2.exercisedb.io/image/9s-B2gB-Tz9m7h",
+		Image:      "/images/workout_upper.png",
+		Location:   "home",
+		SecondaryMuscles: []string{"chest", "shoulders"},
+		Instructions: []string{
+			"Đặt 2 tay lên mép ghế/bậc thảm sau lưng, chân duỗi về trước.",
+			"Hạ hông xuống sâu cho khuỷu tay gập góc 90 độ.",
+			"Dùng lực tay sau duỗi thẳng tay nâng người lên.",
+		},
+		Sets:           3,
+		Reps:           15,
+		RestSeconds:    45,
+		CaloriesBurned: 75,
+		Difficulty:     "Beginner",
+	},
+	{
+		ExerciseID: "ex_009",
 		Name:       "Abdominal Crunch / Plank",
 		NameVi:     "Gập Bụng & Giữ Plank (Core Crunch)",
 		BodyPart:   "waist",
@@ -90,6 +203,7 @@ var defaultExercises = []models.Exercise{
 		Target:     "abs",
 		GIFUrl:     "https://v2.exercisedb.io/image/4s-D4gB-Tz9m7j",
 		Image:      "/images/workout_core.png",
+		Location:   "home",
 		SecondaryMuscles: []string{"obliques", "lower back"},
 		Instructions: []string{
 			"Nằm trên thảm, đầu gối gập 90 độ, 2 tay đặt sau đầu.",
@@ -103,7 +217,7 @@ var defaultExercises = []models.Exercise{
 		Difficulty:     "Beginner",
 	},
 	{
-		ExerciseID: "ex_005",
+		ExerciseID: "ex_010",
 		Name:       "Lat Pulldown",
 		NameVi:     "Kéo Xô Nối Cáp Rộng Tay (Lat Pulldown)",
 		BodyPart:   "back",
@@ -111,16 +225,61 @@ var defaultExercises = []models.Exercise{
 		Target:     "lats",
 		GIFUrl:     "https://v2.exercisedb.io/image/5s-E5gB-Tz9m7k",
 		Image:      "/images/workout_full_body.png",
+		Location:   "gym",
 		SecondaryMuscles: []string{"biceps", "rhomboids", "rear delts"},
 		Instructions: []string{
-			"Sit down at lat pulldown machine, grip bar wider than shoulder width.",
-			"Pull bar down towards upper chest while squeezing shoulder blades together.",
-			"Slowly return bar back up to starting position.",
+			"Nằm ngồi trên máy kéo cáp xô, tay nắm thanh kéo rộng hơn vai.",
+			"Kéo thanh cáp xuống sát ngực trên, gồng chặt 2 bả vai.",
+			"Trả thanh cáp lên từ từ.",
 		},
 		Sets:           4,
 		Reps:           12,
 		RestSeconds:    60,
 		CaloriesBurned: 110,
+		Difficulty:     "Intermediate",
+	},
+	{
+		ExerciseID: "ex_011",
+		Name:       "Resistance Band Standing Row",
+		NameVi:     "Kéo Xô Đứng Với Dây Kháng Lực (Band Row)",
+		BodyPart:   "back",
+		Equipment:  "band",
+		Target:     "lats",
+		GIFUrl:     "https://v2.exercisedb.io/image/5s-E5gB-Tz9m7k",
+		Image:      "/images/workout_full_body.png",
+		Location:   "home",
+		SecondaryMuscles: []string{"biceps", "rear delts"},
+		Instructions: []string{
+			"Móc dây kháng lực vào điểm cố định hoặc dẫm 2 chân lên giữa dây.",
+			"Kéo 2 tay cầm dây về phía hông, ép sát bả vai.",
+			"Thả dây về từ từ.",
+		},
+		Sets:           4,
+		Reps:           15,
+		RestSeconds:    45,
+		CaloriesBurned: 80,
+		Difficulty:     "Beginner",
+	},
+	{
+		ExerciseID: "ex_012",
+		Name:       "Dumbbell Shoulder Press",
+		NameVi:     "Đẩy Vai Ngồi Với Tạ Đơn (Shoulder Press)",
+		BodyPart:   "shoulders",
+		Equipment:  "dumbbell",
+		Target:     "delts",
+		GIFUrl:     "https://v2.exercisedb.io/image/1s-C3gB-Tz9m7i",
+		Image:      "/images/workout_upper.png",
+		Location:   "both",
+		SecondaryMuscles: []string{"triceps", "upper chest"},
+		Instructions: []string{
+			"Ngồi thẳng lưng, 2 tay cầm tạ đơn ngang chiều cao tai.",
+			"Đẩy tạ thẳng lên qua đầu đến khi duỗi gần hết tay.",
+			"Hạ tạ từ từ về vị trí ban đầu.",
+		},
+		Sets:           4,
+		Reps:           12,
+		RestSeconds:    60,
+		CaloriesBurned: 100,
 		Difficulty:     "Intermediate",
 	},
 }
@@ -132,6 +291,8 @@ func GetExercisesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	bodyPart := strings.ToLower(r.URL.Query().Get("bodyPart"))
+	equipment := strings.ToLower(r.URL.Query().Get("equipment"))
+	location := strings.ToLower(r.URL.Query().Get("location"))
 	query := strings.ToLower(r.URL.Query().Get("q"))
 
 	var results []models.Exercise
@@ -145,6 +306,12 @@ func GetExercisesHandler(w http.ResponseWriter, r *http.Request) {
 		if bodyPart != "" && bodyPart != "all" {
 			filter["bodyPart"] = bodyPart
 		}
+		if equipment != "" && equipment != "all" {
+			filter["equipment"] = equipment
+		}
+		if location != "" && location != "all" {
+			filter["location"] = location
+		}
 
 		cursor, err := coll.Find(ctx, filter)
 		if err == nil {
@@ -156,17 +323,20 @@ func GetExercisesHandler(w http.ResponseWriter, r *http.Request) {
 	if len(results) == 0 {
 		for _, ex := range defaultExercises {
 			matchBodyPart := bodyPart == "" || bodyPart == "all" || strings.ToLower(ex.BodyPart) == bodyPart
-			matchQuery := query == "" || strings.Contains(strings.ToLower(ex.Name), query) || strings.Contains(strings.ToLower(ex.NameVi), query)
-			if matchBodyPart && matchQuery {
+			matchEquipment := equipment == "" || equipment == "all" || strings.Contains(strings.ToLower(ex.Equipment), equipment)
+			matchLocation := location == "" || location == "all" || ex.Location == "both" || ex.Location == location
+			matchQuery := query == "" || strings.Contains(strings.ToLower(ex.Name), query) || strings.Contains(strings.ToLower(ex.NameVi), query) || strings.Contains(strings.ToLower(ex.Equipment), query)
+
+			if matchBodyPart && matchEquipment && matchLocation && matchQuery {
 				results = append(results, ex)
 			}
 		}
 	}
 
 	sendJSONResponse(w, http.StatusOK, map[string]interface{}{
-		"status":  "success",
-		"count":   len(results),
-		"data":    results,
+		"status": "success",
+		"count":  len(results),
+		"data":   results,
 	})
 }
 

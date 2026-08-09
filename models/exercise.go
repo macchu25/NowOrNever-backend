@@ -23,5 +23,6 @@ type Exercise struct {
 	RestSeconds      int                `json:"restSeconds" bson:"restSeconds"`
 	CaloriesBurned   int                `json:"caloriesBurned" bson:"caloriesBurned"`
 	Difficulty       string             `json:"difficulty" bson:"difficulty"`
+	Location         string             `json:"location" bson:"location"` // "home", "gym", "both"
 	CreatedAt        time.Time          `json:"createdAt" bson:"createdAt"`
 }
