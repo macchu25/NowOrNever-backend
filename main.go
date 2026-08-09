@@ -9,6 +9,7 @@ import (
 	"backend-go/router"
 )
 
+// Main entry point for Now or Never Railway Go Backend
 func main() {
 	config.LoadConfig()
 
@@ -21,7 +22,7 @@ func main() {
 		WriteTimeout: 15 * time.Second,
 	}
 
-	log.Printf("🚀 [Now or Never Go Backend] Modular server running on http://localhost:%s\n", config.AppConfig.Port)
+	log.Printf("🚀 [Now or Never Go Backend] Server running on port %s\n", config.AppConfig.Port)
 	if err := server.ListenAndServe(); err != nil {
 		log.Fatalf("❌ Server startup error: %v", err)
 	}
