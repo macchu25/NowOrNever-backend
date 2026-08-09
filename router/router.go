@@ -20,6 +20,10 @@ func SetupRouter() *http.ServeMux {
 	mux.HandleFunc("POST /api/v1/auth/google", middleware.EnableCORS(controllers.GoogleAuthHandler))
 	mux.HandleFunc("GET /api/v1/auth/me", middleware.RequireAuth(controllers.MeHandler))
 
+	// Exercise DB Routes
+	mux.HandleFunc("GET /api/v1/exercises", middleware.EnableCORS(controllers.GetExercisesHandler))
+	mux.HandleFunc("GET /api/v1/exercises/detail", middleware.EnableCORS(controllers.GetExerciseByIDHandler))
+
 	// Data Routes
 	mux.HandleFunc("GET /api/v1/data", middleware.EnableCORS(controllers.DataHandler))
 	mux.HandleFunc("POST /api/v1/data", middleware.EnableCORS(controllers.DataHandler))
