@@ -24,5 +24,6 @@ type Exercise struct {
 	CaloriesBurned   int                `json:"caloriesBurned" bson:"caloriesBurned"`
 	Difficulty       string             `json:"difficulty" bson:"difficulty"`
 	Location         string             `json:"location" bson:"location"` // "home", "gym", "both"
+	DemoFrames       []string           `json:"demoFrames" bson:"demoFrames"`
 	CreatedAt        time.Time          `json:"createdAt" bson:"createdAt"`
 }
