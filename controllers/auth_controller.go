@@ -280,3 +280,71 @@ func MeHandler(w http.ResponseWriter, r *http.Request) {
 		"user":   user,
 	})
 }
+
+func SaveSurveyHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		sendJSONResponse(w, http.StatusMethodNotAllowed, map[string]string{"status": "error", "message": "Method not allowed"})
+		return
+	}
+
+	claims, ok := r.Context().Value(middleware.UserContextKey).(*utils.JWTClaims)
+	if !ok || claims == nil {
+		sendJSONResponse(w, http.StatusUnauthorized, map[string]string{"status": "error", "message": "Unauthorized"})
+		return
+	}
+
+	var survey models.Survey
+	if err := json.NewDecoder(r.Body).Decode(&survey); err != nil {
+		sendJSONResponse(w, http.StatusBadRequest, map[string]string{"status": "error", "message": "Invalid survey payload"})
+		return
+	}
+
+	survey.CompletedAt = time.Now()
+
+	// Calculate BMI & TDEE if height and weight present
+	if survey.Height > 0 && survey.Weight > 0 {
+		heightM := survey.Height / 100.0
+		survey.BMI = survey.Weight / (heightM * heightM)
+
+		// Basic BMR calculation (Mifflin-St Jeor formula)
+		bmr := 10*survey.Weight + 6.25*survey.Height - 5*float64(survey.Age)
+		if survey.Gender == "male" {
+			bmr += 5
+		} else {
+			bmr -= 161
+		}
+
+		multiplier := 1.2
+		switch survey.ActivityLevel {
+		case "light":
+			multiplier = 1.375
+		case "moderate":
+			multiplier = 1.55
+		case "active":
+			multiplier = 1.725
+		}
+		survey.TDEE = bmr * multiplier
+	}
+
+	if config.MongoConnected && config.DB != nil {
+		objID, err := primitive.ObjectIDFromHex(claims.UserID)
+		if err == nil {
+			usersColl := config.DB.Collection("users")
+			ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
+			defer cancel()
+
+			usersColl.UpdateOne(ctx, bson.M{"_id": objID}, bson.M{
+				"$set": bson.M{
+					"survey":    survey,
+					"updatedAt": time.Now(),
+				},
+			})
+		}
+	}
+
+	sendJSONResponse(w, http.StatusOK, map[string]interface{}{
+		"status":  "success",
+		"message": "Survey saved successfully",
+		"survey":  survey,
+	})
+}
