@@ -35,6 +35,7 @@ type ServiceStats struct {
 	Uptime         string `json:"uptime"`
 	MongoDBStatus  string `json:"mongoDBStatus"`
 	TotalDocuments int64  `json:"totalDocuments"`
+	Environment    string `json:"environment"`
 }
 
 type ActivityDocument struct {
@@ -57,7 +58,6 @@ var (
 	collectionName  = "activities"
 )
 
-// Simple helper to load .env file if present
 func loadDotEnv(filepath string) {
 	file, err := os.Open(filepath)
 	if err != nil {
@@ -114,17 +114,46 @@ func initMongoDB() {
 	mongoClient = client
 	mongoCollection = client.Database(dbName).Collection(collectionName)
 	mongoConnected = true
-	log.Printf("✅ Successfully connected to MongoDB Atlas! (Database: %s, Collection: %s)", dbName, collectionName)
+	log.Printf("✅ Connected to MongoDB Atlas! (DB: %s, Coll: %s)", dbName, collectionName)
 }
 
+// CORS Middleware supporting Vercel Frontend & Railway Backend connection
 func enableCORS(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+		origin := r.Header.Get("Origin")
+		allowedOriginsEnv := os.Getenv("ALLOWED_ORIGINS")
+
+		// Dynamic CORS matching for Vercel, localhost, and custom domains
+		if origin != "" {
+			isAllowed := false
+			if allowedOriginsEnv == "" || allowedOriginsEnv == "*" {
+				isAllowed = true
+			} else {
+				originsList := strings.Split(allowedOriginsEnv, ",")
+				for _, o := range originsList {
+					o = strings.TrimSpace(o)
+					if o == origin || strings.HasSuffix(origin, ".vercel.app") || o == "*" {
+						isAllowed = true
+						break
+					}
+				}
+			}
+
+			if isAllowed {
+				w.Header().Set("Access-Control-Allow-Origin", origin)
+			} else {
+				w.Header().Set("Access-Control-Allow-Origin", "*")
+			}
+		} else {
+			w.Header().Set("Access-Control-Allow-Origin", "*")
+		}
+
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, PATCH")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With, Accept, Origin")
+		w.Header().Set("Access-Control-Allow-Credentials", "true")
 
 		if r.Method == http.MethodOptions {
-			w.WriteHeader(http.StatusOK)
+			w.WriteHeader(http.StatusNoContent)
 			return
 		}
 
@@ -155,10 +184,11 @@ func handleHealth(w http.ResponseWriter, r *http.Request) {
 	sendJSON(w, http.StatusOK, Response{
 		Status:    "success",
 		Timestamp: time.Now().Format(time.RFC3339),
-		Message:   "Now or Never Go Backend service is healthy and operating normally",
+		Message:   "Now or Never Go Backend on Railway is healthy",
 		Data: map[string]interface{}{
-			"mongoDB": mongoStatus,
-			"uptime":  time.Since(startTime).Round(time.Second).String(),
+			"mongoDB":     mongoStatus,
+			"railwayHost": os.Getenv("RAILWAY_STATIC_URL"),
+			"uptime":      time.Since(startTime).Round(time.Second).String(),
 		},
 	})
 }
@@ -179,6 +209,11 @@ func handleStats(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	envName := "Local"
+	if os.Getenv("RAILWAY_STATIC_URL") != "" || os.Getenv("RAILWAY_ENVIRONMENT") != "" {
+		envName = "Railway Production"
+	}
+
 	stats := ServiceStats{
 		GoVersion:      runtime.Version(),
 		NumGoroutine:   runtime.NumGoroutine(),
@@ -187,6 +222,7 @@ func handleStats(w http.ResponseWriter, r *http.Request) {
 		Uptime:         time.Since(startTime).Round(time.Second).String(),
 		MongoDBStatus:  mongoStatus,
 		TotalDocuments: totalDocs,
+		Environment:    envName,
 	}
 
 	sendJSON(w, http.StatusOK, Response{
@@ -327,7 +363,7 @@ func main() {
 		WriteTimeout: 15 * time.Second,
 	}
 
-	log.Printf("🚀 [Now or Never Go Backend] Listening on http://localhost:%s\n", port)
+	log.Printf("🚀 [Railway Go Backend] Server listening on port %s\n", port)
 	if err := server.ListenAndServe(); err != nil {
 		log.Fatalf("❌ Go Backend server error: %v", err)
 	}
