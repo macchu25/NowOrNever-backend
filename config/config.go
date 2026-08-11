@@ -37,6 +37,7 @@ func LoadConfig() {
 
 	mongoURI := os.Getenv("MONGODB_URI")
 	if mongoURI == "" {
+		log.Println("⚠️ MONGODB_URI not set in environment. Falling back to local MongoDB (mongodb://localhost:27017)...")
 		mongoURI = "mongodb://localhost:27017"
 	}
 
@@ -47,6 +48,7 @@ func LoadConfig() {
 
 	jwtSecret := os.Getenv("JWT_SECRET")
 	if jwtSecret == "" {
+		log.Println("⚠️ JWT_SECRET not set in environment. Using default development secret...")
 		jwtSecret = "nowornever_dev_jwt_secret_change_in_production"
 	}
 

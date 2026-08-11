@@ -8,6 +8,7 @@ server
 
 # OS & Environment
 .DS_Store
-.env
+.env*
+!.env.example
 .vscode/
 .idea/

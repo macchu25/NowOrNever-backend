@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"os"
 	"runtime"
-	"sync"
+	"sync/atomic"
 	"time"
 
 	"backend-go/config"
@@ -17,7 +17,6 @@ import (
 var (
 	startTime    = time.Now()
 	requestCount uint64
-	countMutex   sync.Mutex
 )
 
 type ServiceStats struct {
@@ -54,9 +53,7 @@ func HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func StatsTelemetryHandler(w http.ResponseWriter, r *http.Request) {
-	countMutex.Lock()
-	requestCount++
-	countMutex.Unlock()
+	currentRequests := atomic.AddUint64(&requestCount, 1)
 
 	var m runtime.MemStats
 	runtime.ReadMemStats(&m)
@@ -82,7 +79,7 @@ func StatsTelemetryHandler(w http.ResponseWriter, r *http.Request) {
 		GoVersion:      runtime.Version(),
 		NumGoroutine:   runtime.NumGoroutine(),
 		MemoryAlloc:    fmt.Sprintf("%.2f MB", float64(m.Alloc)/(1024*1024)),
-		TotalRequests:  requestCount,
+		TotalRequests:  currentRequests,
 		Uptime:         time.Since(startTime).Round(time.Second).String(),
 		MongoDBStatus:  mongoStatus,
 		TotalDocuments: totalDocs,

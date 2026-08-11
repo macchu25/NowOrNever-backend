@@ -14,12 +14,13 @@ func EnableCORS(next http.HandlerFunc) http.HandlerFunc {
 		if origin != "" {
 			isAllowed := false
 			if allowedOriginsEnv == "" || allowedOriginsEnv == "*" {
+				// Default to allowing request origin in local dev mode
 				isAllowed = true
 			} else {
 				originsList := strings.Split(allowedOriginsEnv, ",")
 				for _, o := range originsList {
 					o = strings.TrimSpace(o)
-					if o == origin || strings.HasSuffix(origin, ".vercel.app") || o == "*" {
+					if o == origin || o == "*" {
 						isAllowed = true
 						break
 					}
@@ -28,11 +29,7 @@ func EnableCORS(next http.HandlerFunc) http.HandlerFunc {
 
 			if isAllowed {
 				w.Header().Set("Access-Control-Allow-Origin", origin)
-			} else {
-				w.Header().Set("Access-Control-Allow-Origin", "*")
 			}
-		} else {
-			w.Header().Set("Access-Control-Allow-Origin", "*")
 		}
 
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, PATCH")

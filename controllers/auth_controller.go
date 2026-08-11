@@ -54,30 +54,33 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		UpdatedAt: time.Now(),
 	}
 
-	if config.MongoConnected && config.DB != nil {
-		usersColl := config.DB.Collection("users")
-		ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
-		defer cancel()
+	if !config.MongoConnected || config.DB == nil {
+		sendJSONResponse(w, http.StatusServiceUnavailable, map[string]string{"status": "error", "message": "Database unavailable. Cannot register new user at this time."})
+		return
+	}
 
-		var existingUser models.User
-		err := usersColl.FindOne(ctx, bson.M{"email": req.Email}).Decode(&existingUser)
-		if err == nil {
-			sendJSONResponse(w, http.StatusConflict, map[string]string{"status": "error", "message": "Email is already registered. Please login instead."})
-			return
-		}
+	usersColl := config.DB.Collection("users")
+	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
+	defer cancel()
 
-		hashedPassword, err := utils.HashPassword(req.Password)
-		if err != nil {
-			sendJSONResponse(w, http.StatusInternalServerError, map[string]string{"status": "error", "message": "Error hashing password"})
-			return
-		}
-		newUser.PasswordHash = hashedPassword
+	var existingUser models.User
+	err := usersColl.FindOne(ctx, bson.M{"email": req.Email}).Decode(&existingUser)
+	if err == nil {
+		sendJSONResponse(w, http.StatusConflict, map[string]string{"status": "error", "message": "Email is already registered. Please login instead."})
+		return
+	}
 
-		_, err = usersColl.InsertOne(ctx, newUser)
-		if err != nil {
-			sendJSONResponse(w, http.StatusInternalServerError, map[string]string{"status": "error", "message": "Failed to create user in database"})
-			return
-		}
+	hashedPassword, err := utils.HashPassword(req.Password)
+	if err != nil {
+		sendJSONResponse(w, http.StatusInternalServerError, map[string]string{"status": "error", "message": "Error hashing password"})
+		return
+	}
+	newUser.PasswordHash = hashedPassword
+
+	_, err = usersColl.InsertOne(ctx, newUser)
+	if err != nil {
+		sendJSONResponse(w, http.StatusInternalServerError, map[string]string{"status": "error", "message": "Failed to create user in database"})
+		return
 	}
 
 	token, err := utils.GenerateToken(newUser.ID, newUser.Email, newUser.Name)
